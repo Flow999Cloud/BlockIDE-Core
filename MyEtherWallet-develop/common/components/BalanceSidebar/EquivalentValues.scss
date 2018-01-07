@@ -1,0 +1,43 @@
+@import 'common/sass/variables';
+@import 'common/sass/mixins';
+
+.EquivalentValues {
+  &-title {
+    margin-top: 0;
+    margin-bottom: $space;
+  }
+
+  &-values {
+    list-style: none;
+    padding: 0;
+    @include clearfix;
+
+    &-currency {
+      float: left;
+      width: 50%;
+      margin-bottom: $space-xs;
+
+      &:nth-child(odd) {
+        padding-right: $space-sm;
+      }
+      &:nth-child(even) {
+        padding-left: $space-sm;
+      }
+
+      &-label {
+        white-space: pre-wrap;
+        display: inline-block;
+        min-width: 36px;
+      }
+      &-value {
+        font-weight: 600;
+        @include mono;
+      }
+    }
+
+    &-loader {
+      padding: 25px 0;
+      text-align: center;
+    }
+  }
+}
