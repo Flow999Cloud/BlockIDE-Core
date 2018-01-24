@@ -1,0 +1,55 @@
+Talk with Sapan and Andy about OpenCloud story
+* Value-Added Cloud: you pony up some infrastructure (VMs, OpenStack, etc) and give us access, and we give your site-local services access to the OpenCloud servces
+-- CoBlitz, Syndicate, etc.
+* Benefits of deploying into the edge:
+-- Privacy: you have first say over the computations over your data, so the greater cloud doesn't
+-- Latency: your services and the shards of the Value-Added Cloud run locally, giving you faster, possibly more available access 
+-- Legacy: continue to support your own services as they are, but augmented with the greater cloud's services 
+
+Key value: OpenCloud offers logical composition of services
+-- "narrow waist" between local services and global services 
+-- entirely new "co-op" SaaS is possible--some parts run locally, others in the Value-Added Cloud
+-- poster child: Syndicate, CoBlitz
+
+How far is the edge?
+-- Out to PoPs and regional offices: great for ISPs who don't want to build a new Amazon, but want Amazon's value added to their services.  They can build better VoD, advertising, caching, etc.
+-- Out to University and organization peering points: great for supporting legacy services, and great for privacy whereby organization users' data and behavior is masked by local computing
+-- Out to individual users' machines: new classes of consumer services (Gmail, Facebook, Tumblr, Twitter, etc.) that preserve privacy through local computations before shipping data out to the world
+
+
+READING:
+// http://www1.icsi.berkeley.edu/~barath/papers/icn-hotnets11.pdf
+--- Web caching is Zipfian, and Kazaa is worse-than
+--- Web requests are heavy-tailed, and this is even true today with Facebook for example
+--- the benefits of cooperative caching are limited at scale--effectiveness grows with log(cache size)
+--- means that it's probably good to have a few large caches handle the most popular content, and don't bother with less popular content (pervasive caching might not be worthwhile)
+---- """ Thus, there is an interesting tradeoff between naming
+----     (hierarchical or not), routing behavior (just route to server,
+----     or route to nearest copy), caching behavior (is the working
+----     set size small?), the size of objects (which cannot be single
+----     packets unless the requests can be handled at packet speeds),
+----     and the narrow waist (the waist must be able to operate at line
+----     speeds). Here we have suggested (subject to further research,
+----     of course) that there is little reason (based on performance)
+----     to adopt an ICN design that only caches along path, which
+----     implies nonaggregated names, which implies large routing
+----     tables, which implies slower name-based routing, which
+----     implies large ICN objects, which implies an IP waist. We
+----     present this line of reasoning not as a hardened conclusion,
+---- """ but as a conjecture that should be investigated.
+
+// pages.cs.wisc.edu/~akella/CS838/F09/838-Papers/ccn.pdf
+--- NDN (networking named data)
+--- Routers forward packets based on longest content name prefix matching
+--- Routers cache packets of data for subsequent requests
+--- Router components:
+------ Forwarding Information Base (FIB): content prefix --> next hop 
+------ Content Store (CS):  cache of packets
+------ Pending Interest Table (PIT):  recently requested content items that have not been served
+--- Interest packet, Data packet
+--- Interest packet is "request"--leaves breadcrumbs in routers en route to content, which get used by routers to send data back to the instigater of the Instance packet
+
+// conferences.sigcomm.org/sigcomm/2011/papers/icn/p44.pdf
+--- Feasibility study of CCN (great for CDNs, not so great for Internet)
+--- examines power draw and space requirements of today's technology
+--- billions of IP addresses, but trillions of content names

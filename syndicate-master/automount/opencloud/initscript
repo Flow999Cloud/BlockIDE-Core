@@ -1,0 +1,138 @@
+#!/bin/bash
+
+#   Copyright 2014 The Trustees of Princeton University
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+DESC="Syndicate automount daemon"
+NAME="syndicated.py"
+
+SYNDICATED=/usr/bin/syndicated.py
+#SYNDICATED="./syndicated.py -s 0123456789abcdef"
+
+CONFIG=/etc/syndicated/syndicated.conf 
+#CONFIG=./opencloud/syndicated.conf
+
+get_hostname_and_slicename() {
+   # $1 will become the slicename 
+   # $2 will become the hostname
+   # TODO: more robust solution than this
+   
+   tmpdir=$(mktemp -d /tmp/syndicated-opencloud-XXXXXX)
+   pushd "$tmpdir"
+    
+   curl --connect-timeout 60 http://169.254.169.254/2009-04-04/user-data > user-data.yaml 2>curl.out
+   curl_error=$?
+   
+   if [ $curl_error -ne 0 ]; then
+      echo "Failed to get user info, curl error $curl_error"
+      popd
+      rm -rf "$tmpdir"
+      return 1
+   fi 
+   
+   # extract hostname and slice name 
+   opencloud_slicename=$(awk '$1 == "slicename:" { print $2 }' user-data.yaml | sed 's/"//g')
+   opencloud_hostname=$(awk '$1 == "hostname:" { print $2 }' user-data.yaml | sed 's/"//g')
+
+   popd
+   rm -rf "$tmpdir" 
+   
+   if ! [ $opencloud_slicename ]; then
+      echo "Failed to determine OpenCloud slice name"
+      return 1
+   fi
+   
+   if ! [ $opencloud_hostname ]; then
+      echo "Failed to determine OpenCloud hostname"
+      return 1
+   fi 
+   
+   eval "$1=$opencloud_hostname"
+   eval "$2=$opencloud_slicename"
+   
+   return 0
+}
+   
+
+start() {
+   
+   syndicated_hostname=""
+   syndicated_slicename=""
+   
+   get_hostname_and_slicename syndicated_hostname syndicated_slicename 
+   reload_error=$?
+   
+   if [ $reload_error -ne 0 ]; then 
+      return 1
+   fi 
+  
+   $SYNDICATED -c $CONFIG -S $syndicated_slicename -H $syndicated_hostname
+}
+
+stop() {
+   $SYNDICATED -c $CONFIG stop
+}
+
+restart() {
+   stop
+   start
+}
+
+status() {
+   $SYNDICATED -c $CONFIG status
+}
+
+case "$1" in
+   start)
+      echo -n "Starting $DESC:  "
+      start
+      if [ $? -ne 0 ]; then
+         echo "FAILED"
+      else
+         echo "$NAME"
+      fi
+      ;;
+
+   stop)
+      echo -n "Stopping $DESC:  "
+      stop
+      if [ $? -ne 0 ]; then
+         echo "FAILED"
+      else
+         echo "$NAME"
+      fi
+      ;;
+
+   restart)
+      echo -n "Restarting $DESC:  "
+      restart 
+      if [ $? -ne 0 ]; then
+         echo "FAILED"
+      else
+         echo "$NAME"
+      fi
+      ;;
+
+   status)
+      status; exit $?
+      ;;
+
+   *)
+      echo "Usage: $NAME {start|stop|restart|status}" >&2
+      exit 1
+      ;;
+
+esac
+
+exit 0

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+  
+  {% block head %}
+    <h1> Create User Gateway </h1>
+  {% endblock %}
+  {% block mainbody %}
+  <p class="error">{{ message }}</p><br>
+  <form action='{% url django_ug.views.create %}' method="post">{% csrf_token %}
+    <table class="createvolume" border>
+      {{ form.as_table }}
+    </table>
+    <input class="submit center" type="submit" value="Submit" />
+  </form>
+  {% endblock %}
+  {% block footer %}
+  	<a href='{% url django_ug.views.mygateways %}'>My gateways</a>
+  	<a href='{% url django_home.views.home %}'>Home</a>
+  {% endblock %}

@@ -1,0 +1,141 @@
+#!/usr/bin/env python 
+
+"""
+   Copyright 2013 The Trustees of Princeton University
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+"""
+
+import sys
+import os
+import signal
+import errno 
+import time
+import setproctitle
+import time
+
+import syndicate.rg.common as rg_common
+import syndicate.rg.main as rg_main
+import syndicate.util.watchdog as watchdog
+import syndicate.util.daemonize as daemonize
+
+log = rg_common.get_logger()
+
+# respawn the child if its exit status is one of these:
+RESPAWN_EXIT_STATUES = range(1,255)
+
+RG_PID = 0
+LOG_FD = None
+
+#-------------------------------
+def death_handler( signum, frame ):
+   global RG_PID
+   
+   log.info("Caught signal %s" % signum )
+   
+   if RG_PID > 0:
+      watchdog.stop_child( RG_PID )
+   
+   sys.exit(0)
+
+#-------------------------------
+def watchdog_PID( pid ):
+   global RG_PID
+   RG_PID = pid
+   return 0
+
+#-------------------------------
+def watchdog_need_respawn( exit_status ):
+   global RG_PID 
+   RG_PID = 0
+   
+   return watchdog.check_exit_status( exit_status, respawn_exit_statuses=RESPAWN_EXIT_STATUES )
+      
+#-------------------------------
+def spawn_rg( config, old_exit_status ):
+   """
+   Spawn an RG.
+   """
+   rc, syndicate = rg_main.init_from_config( config )
+   if rc != 0:
+      log.error("init_from_config rc = %s", rc)
+      return rc
+   
+   setproctitle.setproctitle( child_proc_title( config['volume'] ) )
+   
+   #rc = rg_main.run_devel( syndicate.hostname(), syndicate.portnum() )
+   rc = rg_main.run_bjoern( syndicate.hostname(), syndicate.portnum() )
+   
+   return rc
+
+
+#-------------------------------
+def supervisor_proc_title( volume ):
+   return watchdog.attr_proc_title( "syndicate-rg", {"volume": volume} )
+
+
+#-------------------------------
+def child_proc_title( volume ):
+   return watchdog.attr_proc_title( "syndicate-rg-worker", {"volume": volume} )
+
+
+#-------------------------------
+if __name__ == "__main__":
+   
+   argv = sys.argv[:]
+   
+   # read configuation early, so we can set up log and pid files
+   config = rg_main.build_config( argv )
+   if config is None:
+      sys.exit(1)
+         
+   setproctitle.setproctitle( supervisor_proc_title(config['volume']) )
+   
+   my_signals = [signal.SIGTERM, signal.SIGFPE, signal.SIGQUIT, signal.SIGABRT, signal.SIGINT]
+   
+   # set signal handlers
+   for sig in my_signals:
+      signal.signal( sig, death_handler )
+   
+   # run in foreground?
+   foreground = config['foreground']
+   
+   logfile_path = None 
+   pidfile_path = config.get('pidfile', None)
+   
+   if config.has_key('logdir'):
+      logfile_path = os.path.join( config['logdir'], "syndicate-rg.log" )
+   
+   if not foreground:
+      # become a daemon
+      log.info("Starting as a daemon")
+      
+      daemonize.daemonize( lambda: watchdog.main( lambda old_exit_status: spawn_rg(config, old_exit_status),
+                                                  pid_cb=watchdog_PID,
+                                                  exit_cb=watchdog_need_respawn,
+                                                  parent_signals=my_signals,
+                                                  respawn_exit_statuses=RESPAWN_EXIT_STATUES ), 
+                           logfile_path=logfile_path,
+                           pidfile_path=pidfile_path )
+   
+   else:
+      # run in the foreground
+      log.info("Running in the foreground")
+      
+      watchdog.main( lambda old_exit_status: spawn_rg(config, old_exit_status),
+                     pid_cb=watchdog_PID,
+                     exit_cb=watchdog_need_respawn,
+                     parent_signals=my_signals,
+                     respawn_exit_statuses=RESPAWN_EXIT_STATUES )
+      
+      

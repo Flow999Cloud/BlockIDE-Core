@@ -1,0 +1,26 @@
+<div class="form" ng-controller="MainController">
+  <img class="center" height="75px" alt="Brand" src="img/etherparty.png">
+
+  <h1>Buy Ether with BTC</h1>
+  <form ng-submit="submit()">
+    <div class="field-wrap">
+      <input autocomplete="off" placeholder="Ether Address" required="" type="text" ng-model="address">
+    </div>
+
+    <div class="field-wrap">
+      <div class="input-group">
+        <input ng-model="etherAmount" ng-change="calculateBTCAmount()" autocomplete="off" id="ether" placeholder="Ether Amount" required="" type="number">
+        <span class="input-group-addon">Ether</span>
+      </div>
+    </div>
+
+    <div class="field-wrap">
+      <div class="input-group">
+        <input autocomplete="off" disabled id="btcamount" type="number" ng-model="btcAmount">
+        <span class="input-group-addon">BTC</span>
+      </div>
+    </div>
+
+    <button class="button button-block" type="submit">Get Started</button>
+  </form>
+</div>
