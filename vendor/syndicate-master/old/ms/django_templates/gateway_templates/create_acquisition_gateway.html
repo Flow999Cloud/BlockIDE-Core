@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+  
+  {% block head %}
+    <h1> Create Acquisition Gateway </h1>
+  {% endblock %}
+  {% block mainbody %}
+  <p class="error">{{ message }}</p><br>
+  <form action='{% url django_ag.views.create %}' method="post" enctype="multipart/form-data">{% csrf_token %}
+    <table  border>
+      {{ form.as_table }}
+    </table>
+    <input class="submit center" type="submit" value="Submit" />
+  </form>
+  {% endblock %}
+  {% block footer %}
+  	<a href='{% url django_home.views.home %}'>Home</a>
+  {% endblock %}

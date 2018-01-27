@@ -1,0 +1,95 @@
+"""
+   Copyright 2013 The Trustees of Princeton University
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+"""
+# build watchdog daemon
+
+import os
+
+# add additional source files here
+wd_daemon_source = """
+   daemon-config.cpp
+   wdd-main.cpp
+   thrift/WDDaemon_service_impl.cpp
+   thrift/cpp/WDDaemon.cpp
+   thrift/cpp/AGDaemon.cpp
+   thrift/cpp/WDDaemon_server.cpp
+   thrift/cpp/wd_daemon_constants.cpp
+   thrift/cpp/wd_daemon_types.cpp
+   thrift/cpp/common_types.cpp
+   thrift/cpp/common_constants.cpp
+   thrift-common.cpp
+"""
+
+ag_daemon_source = """
+   daemon-config.cpp
+   agd-main.cpp
+   thrift/AGDaemon_service_impl.cpp
+   thrift/cpp/WDDaemon.cpp
+   thrift/cpp/AGDaemon.cpp
+   thrift/cpp/AGDaemon_server.cpp
+   thrift/cpp/ag_daemon_constants.cpp
+   thrift/cpp/ag_daemon_types.cpp
+   thrift/cpp/common_types.cpp
+   thrift/cpp/common_constants.cpp
+   thrift-common.cpp
+"""
+
+# add source file search paths here
+CPPPATH = """
+   /usr/include/thrift
+   /usr/local/include/thrift
+   #AG/watchdog-daemon
+   #AG/watchdog-daemon/thrift/cpp
+   #AG/watchdog-daemon/thrift
+"""
+
+# add library paths here
+LIBPATH = """
+"""
+
+# add libraries here
+LIBS = """
+    libthrift
+    config++
+    pthread
+    rt
+"""
+
+# add additional CPPFLAGS here
+CPPFLAGS = """
+    -g 
+    -DHAVE_NETINET_IN_H 
+    -DHAVE_INTTYPES_H
+"""
+
+
+# get our environment
+Import('env')
+env = env.Clone()
+
+env.Append(LIBS = Split(LIBS))
+env.Append(CPPPATH = Split(CPPPATH))
+env.Append(CPPFLAGS = Split(CPPFLAGS))
+env.Append(LIBPATH = Split(LIBPATH))
+
+wd_daemon_obj = env.Object( source=Split(wd_daemon_source) )
+ag_daemon_obj = env.Object( source=Split(ag_daemon_source) )
+
+# generate the shared library
+wd_daemon = env.Program("wd-daemon", source=[wd_daemon_obj])
+ag_daemon = env.Program("ag-daemon", source=[ag_daemon_obj])
+
+Return( 'ag_daemon wd_daemon' )
+

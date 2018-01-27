@@ -1,0 +1,66 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render snapshot 1`] = `
+<Swap
+  bityOrder={Object {}}
+  bityOrderCreateRequestedSwap={[Function]}
+  bityOrderStatus={null}
+  bityRates={
+    Object {
+      "allIds": Array [],
+      "byId": Object {},
+    }
+  }
+  changeStepSwap={[Function]}
+  destination={
+    Object {
+      "amount": NaN,
+      "id": "ETH",
+    }
+  }
+  destinationAddress=""
+  destinationAddressSwap={[Function]}
+  initSwap={[Function]}
+  isFetchingRates={null}
+  isPostingOrder={false}
+  loadBityRatesRequestedSwap={[Function]}
+  loadShapeshiftRatesRequestedSwap={[Function]}
+  options={
+    Object {
+      "allIds": Array [],
+      "byId": Object {},
+    }
+  }
+  origin={
+    Object {
+      "amount": NaN,
+      "id": "BTC",
+    }
+  }
+  outputTx={null}
+  paymentAddress={null}
+  provider="bity"
+  restartSwap={[Function]}
+  secondsRemaining={null}
+  shapeshiftOrder={Object {}}
+  shapeshiftOrderCreateRequestedSwap={[Function]}
+  shapeshiftOrderStatus={null}
+  shapeshiftRates={
+    Object {
+      "allIds": Array [],
+      "byId": Object {},
+    }
+  }
+  showNotification={[Function]}
+  startOrderTimerSwap={[Function]}
+  startPollBityOrderStatus={[Function]}
+  startPollShapeshiftOrderStatus={[Function]}
+  step={1}
+  stopLoadBityRatesSwap={[Function]}
+  stopLoadShapeshiftRatesSwap={[Function]}
+  stopOrderTimerSwap={[Function]}
+  stopPollBityOrderStatus={[Function]}
+  stopPollShapeshiftOrderStatus={[Function]}
+  swapProvider={[Function]}
+/>
+`;

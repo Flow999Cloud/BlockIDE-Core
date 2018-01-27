@@ -1,0 +1,59 @@
+@import 'common/sass/variables';
+
+.CurrencySwap {
+  text-align: center;
+
+  &-title {
+    font-weight: 100;
+    margin-bottom: $space * 2.5;
+  }
+
+  &-input,
+  &-divider {
+    display: inline-block;
+    vertical-align: top;
+  }
+  &-input-group {
+    display: inline-block;
+  }
+  &-error-message {
+    display: block;
+    min-height: 25px;
+    color: $brand-danger;
+    text-align: left;
+  }
+  &-inner-wrap {
+    display: block;
+  }
+  @media (min-width: $screen-xs-min) {
+    &-inner-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+  &-dropdown {
+    display: inline-block;
+    margin: 0.5rem 0;
+  }
+
+  &-input {
+    width: 100%;
+    max-width: 10rem;
+    margin-right: $space-sm;
+  }
+
+  &-divider {
+    height: $input-height-base;
+    line-height: $input-height-base;
+    margin: 0 $space * 2;
+    font-weight: 100;
+  }
+
+  &-submit {
+    margin-top: $space * 2.5;
+  }
+}
+
+
+

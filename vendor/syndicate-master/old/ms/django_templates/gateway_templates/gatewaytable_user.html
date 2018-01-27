@@ -1,0 +1,37 @@
+{% load ms_extras %}
+<table class="volume" border>
+      <thead>
+	<th> Gateway Name </th>
+	<th> Volume </th>
+	<th> Volume Owner </th>
+	<th> Host </th>
+	<th> Port </th>
+	<th> Write permissions </th>
+      </thead>
+      <tbody>
+
+	{% for g, v, o in gateway_vols_owners %} 
+
+	<tr>
+      <td><a href='{% url django_ug.views.viewgateway g.g_id %}'>{{g.ms_username|replace:"_|| "}}</a></td>
+      {% if v %}
+	  <td>{{v.name|replace:"_|| "}}</td>
+	  <td>{{o.email}}</td>
+      {% else %}
+      <td colspan="2">No attached volume.</td>
+      {% endif %}
+	  <td>{{g.host}}</td>
+	  <td>{{g.port}}</td>
+	  <td>{% if g.read_write %}Yes{% else %}No{% endif %}</td>
+	</tr>
+
+	{% empty %}
+
+	<tr>
+	  <td colspan="6"> No gateways exist </td>
+	</tr>
+
+	{% endfor %}
+
+      </tbody>
+    </table>

@@ -1,0 +1,37 @@
+How this project is organized:
+
+/libsyndicate:
+
+This directory contains source files needed by multiple gateways.
+
+/UG
+
+This directory contains source files specific to the User Gateway implementations.
+
+/RG
+
+This directory contains source files specific to the Replica Gateway implementations.
+
+/AG
+
+This directory contains source files specific to the Acquisition Gateway implementations.
+
+/papers
+
+This directory contains experimental data, paper source files, posters, and figures.
+
+/planetlab
+
+This directory contains scripts and files needed for deploying Syndicate on PlanetLab, running experiments, and analyzing experimental data.
+
+/ms
+
+This directory contains the Google AppEngine implementation of the Metadata Service.
+
+/old
+
+This directory contains obsolete code.  No need to look through here.
+
+github:          https://github.com/jcnelson/syndicate.git
+mailing list:    syndicate@lists.cs.princeton.edu
+primary author:  Jude Nelson (jcnelson@cs.princeton.edu)
